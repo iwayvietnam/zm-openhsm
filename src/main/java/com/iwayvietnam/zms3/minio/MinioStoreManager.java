@@ -87,12 +87,13 @@ public class MinioStoreManager extends ExternalStoreManager {
             throw new RuntimeException(e);
         }
         client = null;
+        executor = null;
     }
 
     @Override
     public String writeStreamToStore(InputStream in, long actualSize, Mailbox mailbox) throws IOException, ServiceException {
         ZimbraLog.store.debug(String.format(
-            "Minio.writeStreamToStore - start: actualSize - %s, accountId - %s", actualSize, mailbox.getAccountId()
+            "writeStreamToStore - start: actualSize - %s, accountId - %s", actualSize, mailbox.getAccountId()
         ));
         var locator = LocatorUtil.generateLocator(mailbox);
 
@@ -117,14 +118,14 @@ public class MinioStoreManager extends ExternalStoreManager {
         }
 
         String stringLocator = LocatorUtil.toStringLocator(locator);
-        ZimbraLog.store.debug(String.format("Minio.writeStreamToStore() - end: locator - %s", stringLocator));
+        ZimbraLog.store.debug(String.format("writeStreamToStore() - end: locator - %s", stringLocator));
         return stringLocator;
     }
 
     @Override
     public InputStream readStreamFromStore(String locator, Mailbox mailbox) throws IOException {
         ZimbraLog.store.debug(String.format(
-            "Minio.readStreamFromStore() - start: locator - %s, accountId - %s", locator, mailbox.getAccountId()
+            "readStreamFromStore() - start: locator - %s, accountId - %s", locator, mailbox.getAccountId()
         ));
 
         var el = LocatorUtil.fromStringLocator(locator);
