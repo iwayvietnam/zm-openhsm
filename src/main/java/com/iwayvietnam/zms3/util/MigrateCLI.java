@@ -37,7 +37,7 @@ public class MigrateCLI {
 
     static {
         options.addOption(null, OPT_MAILBOX, true, "Mailbox for migration");
-        options.addOption(null, OPT_STOP_ON_ERROR, false, "Stop replay on any error");
+        options.addOption(null, OPT_STOP_ON_ERROR, false, "Stop migrate on any error");
         options.addOption(OPT_HELP, "help", false, "Show help (this output)");
     }
 
