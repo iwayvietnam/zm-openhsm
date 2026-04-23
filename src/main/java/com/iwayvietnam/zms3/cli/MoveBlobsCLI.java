@@ -20,24 +20,28 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.util;
+package com.iwayvietnam.zms3.cli;
 
 import org.apache.commons.cli.Options;
 
 /**
- * Migrate CLI
+ * Move Blobs CLI
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class MigrateCLI {
-    private static final String OPT_MAILBOX = "mailbox";
-    private static final String OPT_STOP_ON_ERROR = "stopOnError";
+public class MoveBlobsCLI {
+    private static final String OPT_SID = "sid";
+    private static final String OPT_DID = "did";
+    private static final String OPT_TYPE = "t";
+    private static final String OPT_QUERY = "q";
     private static final String OPT_HELP = "h";
 
     private static Options options = new Options();
 
     static {
-        options.addOption(null, OPT_MAILBOX, true, "Mailbox for migration");
-        options.addOption(null, OPT_STOP_ON_ERROR, false, "Stop migrate on any error");
+        options.addOption(OPT_SID, "source", true, "Source volume Id");
+        options.addOption(OPT_DID, "destination", false, "Destination volume Id");
+        options.addOption(OPT_TYPE, "types", false, "Comma-separated list of item types or 'all'");
+        options.addOption(OPT_QUERY, "query", false, "Query parameters (default: 'is:anywhere')");
         options.addOption(OPT_HELP, "help", false, "Show help (this output)");
     }
 
