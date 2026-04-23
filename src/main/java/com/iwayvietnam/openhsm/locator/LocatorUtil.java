@@ -20,11 +20,11 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.locator;
+package com.iwayvietnam.openhsm.locator;
 
-import com.iwayvietnam.zms3.config.Configuration;
-import com.iwayvietnam.zms3.config.PropertiesConfiguration;
-import com.iwayvietnam.zms3.config.SettingsConstants;
+import com.iwayvietnam.openhsm.config.Configuration;
+import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
+import com.iwayvietnam.openhsm.config.SettingsConstants;
 import com.zimbra.cs.mailbox.Mailbox;
 
 import java.util.UUID;

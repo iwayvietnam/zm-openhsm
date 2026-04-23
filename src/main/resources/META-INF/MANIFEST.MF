@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Zimbra-Extension-Name: com_iwayvietnam_zms3
-Zimbra-Extension-Class: com.iwayvietnam.zms3.ZmS3Extension
+Zimbra-Extension-Class: com.iwayvietnam.openhsm.OpenHSMExtension
 Implementation-Vendor: iWay Vietnam
 Implementation-Title: Zimbra S3 Store Extension (Zm S3)
 Implementation-Version: 1.0.0

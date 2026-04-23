@@ -1,4 +1,4 @@
-package com.iwayvietnam.zms3.mover;
+package com.iwayvietnam.openhsm.mover;
 
 import com.zimbra.cs.store.MailboxBlob;
 

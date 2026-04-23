@@ -20,26 +20,19 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.locator;
+package com.iwayvietnam.openhsm.config;
 
 /**
- * S3 Locator
+ * Settings Constants
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class S3Locator {
-    private final String bucketName;
-    private final String key;
+public final class SettingsConstants {
+    public static final String ZIMBRA = "zimbra";
+    public static final String ZM_S3_CONFIG_FILE = "zm.s3.properties";
 
-    public S3Locator(String bucketName, String key) {
-        this.bucketName = bucketName;
-        this.key = key;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public String getKey() {
-        return key;
-    }
+    public static final String ZM_S3_ENDPOINT = "s3.endpoint";
+    public static final String ZM_S3_ACCESS_KEY = "s3.accessKey";
+    public static final String ZM_S3_SECRET_KEY = "s3.secretKey";
+    public static final String ZM_S3_STORE_NAME = "s3.storeName";
+    public static final String ZM_S3_DELETE_THREADS = "s3.deleteThreads";
 }

@@ -20,20 +20,32 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.config;
+package com.iwayvietnam.openhsm;
+
+import com.zimbra.common.service.ServiceException;
+import com.zimbra.common.util.ZimbraLog;
+import com.zimbra.cs.extension.ExtensionException;
+import com.zimbra.cs.extension.ZimbraExtension;
 
 /**
- * Configuration interface
+ * Zimbra S3
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public interface Configuration {
-    String getEndpoint();
+public class OpenHSMExtension implements ZimbraExtension {
+    public static final String EXTENSION_NAME = "s3-store-manager";
+    @Override
 
-    String getAccessKey();
+    public String getName() {
+        return EXTENSION_NAME;
+    }
 
-    String getSecretKey();
+    @Override
+    public void init() throws ExtensionException, ServiceException {
+        ZimbraLog.store.info("S3: initializing S3 Store Manager Extension");
+    }
 
-    String getStoreName();
-
-    int getDeleteThreads();
+    @Override
+    public void destroy() {
+        ZimbraLog.store.info("S3: destroying S3 Store Manager Extension");
+    }
 }

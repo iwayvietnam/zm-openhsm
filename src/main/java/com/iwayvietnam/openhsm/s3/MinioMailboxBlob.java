@@ -20,32 +20,32 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3;
+package com.iwayvietnam.openhsm.s3;
 
-import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
-import com.zimbra.cs.extension.ExtensionException;
-import com.zimbra.cs.extension.ZimbraExtension;
+import com.zimbra.cs.mailbox.Mailbox;
+import com.zimbra.cs.store.StoreManager;
+import com.zimbra.cs.store.external.ExternalMailboxBlob;
 
 /**
- * Zimbra S3
+ * Minio Mailbox Blob
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class ZmS3Extension implements ZimbraExtension {
-    public static final String EXTENSION_NAME = "s3-store-manager";
-    @Override
-
-    public String getName() {
-        return EXTENSION_NAME;
+public class MinioMailboxBlob extends ExternalMailboxBlob {
+    protected MinioMailboxBlob(Mailbox mbox, int itemId, int revision, String locator) {
+        super(mbox, itemId, revision, locator);
     }
 
     @Override
-    public void init() throws ExtensionException, ServiceException {
-        ZimbraLog.store.info("S3: initializing S3 Store Manager Extension");
-    }
+    public boolean validateBlob() {
+        boolean status = false;
 
-    @Override
-    public void destroy() {
-        ZimbraLog.store.info("S3: destroying S3 Store Manager Extension");
+        try {
+            status = ((MinioStoreManager) StoreManager.getInstance()).validate(getLocator(), getMailbox());
+        } catch (Exception e) {
+            ZimbraLog.store.warn(String.format("Failed to validate - %s", getLocator()), e);
+        }
+
+        return status;
     }
 }

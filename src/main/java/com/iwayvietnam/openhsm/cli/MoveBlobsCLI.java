@@ -20,7 +20,7 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.cli;
+package com.iwayvietnam.openhsm.cli;
 
 import org.apache.commons.cli.Options;
 

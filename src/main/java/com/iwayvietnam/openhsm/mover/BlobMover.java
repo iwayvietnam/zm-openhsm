@@ -1,4 +1,4 @@
-package com.iwayvietnam.zms3.mover;
+package com.iwayvietnam.openhsm.mover;
 
 public interface BlobMover {
     void moveBlobs();

@@ -20,11 +20,11 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.minio;
+package com.iwayvietnam.openhsm.s3;
 
-import com.iwayvietnam.zms3.config.PropertiesConfiguration;
-import com.iwayvietnam.zms3.locator.LocatorUtil;
-import com.iwayvietnam.zms3.locator.S3Locator;
+import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
+import com.iwayvietnam.openhsm.locator.LocatorUtil;
+import com.iwayvietnam.openhsm.locator.S3Locator;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.mailbox.Mailbox;

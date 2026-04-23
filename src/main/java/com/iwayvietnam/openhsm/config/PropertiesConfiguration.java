@@ -20,7 +20,7 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.config;
+package com.iwayvietnam.openhsm.config;
 
 import com.zimbra.common.localconfig.LC;
 import com.zimbra.common.util.StringUtil;

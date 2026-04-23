@@ -20,32 +20,20 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.zms3.minio;
-
-import com.zimbra.common.util.ZimbraLog;
-import com.zimbra.cs.mailbox.Mailbox;
-import com.zimbra.cs.store.StoreManager;
-import com.zimbra.cs.store.external.ExternalMailboxBlob;
+package com.iwayvietnam.openhsm.config;
 
 /**
- * Minio Mailbox Blob
+ * Configuration interface
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class MinioMailboxBlob extends ExternalMailboxBlob {
-    protected MinioMailboxBlob(Mailbox mbox, int itemId, int revision, String locator) {
-        super(mbox, itemId, revision, locator);
-    }
+public interface Configuration {
+    String getEndpoint();
 
-    @Override
-    public boolean validateBlob() {
-        boolean status = false;
+    String getAccessKey();
 
-        try {
-            status = ((MinioStoreManager) StoreManager.getInstance()).validate(getLocator(), getMailbox());
-        } catch (Exception e) {
-            ZimbraLog.store.warn(String.format("Failed to validate - %s", getLocator()), e);
-        }
+    String getSecretKey();
 
-        return status;
-    }
+    String getStoreName();
+
+    int getDeleteThreads();
 }

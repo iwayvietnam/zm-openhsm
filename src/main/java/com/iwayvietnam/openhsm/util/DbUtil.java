@@ -1,6 +1,6 @@
-package com.iwayvietnam.zms3.util;
+package com.iwayvietnam.openhsm.util;
 
-import com.iwayvietnam.zms3.mover.MovedItem;
+import com.iwayvietnam.openhsm.mover.MovedItem;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.cs.db.DbMailItem;
 import com.zimbra.cs.mailbox.Mailbox;
