@@ -1,5 +1,5 @@
-Zimbra S3-compatible store manager (Zm S3)
-=========================================
+Zimbra Open Hierarchical Storage Management (Zm OpenHSM)
+========================================================
 Zm OpenHSM is the Hierarchical Storage Management extension for Zimbra Collaboration Open Source Edition.  
 Copyright (C) 2026-present iWay Vietnam and/or its affiliates. All rights reserved.
 
