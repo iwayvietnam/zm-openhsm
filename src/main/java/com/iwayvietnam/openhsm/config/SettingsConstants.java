@@ -28,7 +28,7 @@ package com.iwayvietnam.openhsm.config;
  */
 public final class SettingsConstants {
     public static final String ZIMBRA = "zimbra";
-    public static final String ZM_S3_CONFIG_FILE = "zm.s3.properties";
+    public static final String ZM_S3_CONFIG_FILE = "zm.openhsm.properties";
 
     public static final String ZM_S3_ENDPOINT = "s3.endpoint";
     public static final String ZM_S3_ACCESS_KEY = "s3.accessKey";

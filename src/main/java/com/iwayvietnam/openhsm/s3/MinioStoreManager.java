@@ -39,9 +39,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Minio Store Manager
@@ -49,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MinioStoreManager extends ExternalStoreManager {
     private MinioClient client;
-    private ThreadPoolExecutor executor;
+    private ExecutorService executor;
     private final Set<String> bucketNames = new HashSet<String>();
 
     @Override
@@ -61,11 +59,7 @@ public class MinioStoreManager extends ExternalStoreManager {
                 .endpoint(config.getEndpoint())
                 .credentials(config.getAccessKey(), config.getSecretKey())
                 .build();
-        executor = new ThreadPoolExecutor(config.getDeleteThreads(),
-            config.getDeleteThreads(),
-                0L,
-            TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(config.getDeleteThreads() * 10)); // Blocking queue để cho request đợi
+        executor = Executors.newFixedThreadPool(config.getDeleteThreads());
         try {
             fillBucketNames();
         } catch (MinioException e) {
