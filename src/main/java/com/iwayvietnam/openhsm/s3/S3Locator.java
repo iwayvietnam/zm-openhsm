@@ -20,37 +20,26 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.openhsm.util;
-
-import com.iwayvietnam.openhsm.mover.MovedItem;
-import com.zimbra.common.service.ServiceException;
-import com.zimbra.cs.db.DbMailItem;
-import com.zimbra.cs.mailbox.Mailbox;
+package com.iwayvietnam.openhsm.s3;
 
 /**
- * Db Util
+ * S3 Locator
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class DbUtil {
-    public static boolean alterVolume(Mailbox mbox, MovedItem info, int volumeId) throws ServiceException {
-        String table = null;
-        String idColumn = null;
+public class S3Locator {
+    private final String bucketName;
+    private final String key;
 
-        if (info.fromRevision()) {
-            table = DbMailItem.getRevisionTableName(mbox, info.fromDumpster());
-            idColumn = "item_id";
-        } else {
-            table = DbMailItem.getMailItemTableName(mbox, info.fromDumpster());
-            idColumn = "id";
-        }
+    public S3Locator(String bucketName, String key) {
+        this.bucketName = bucketName;
+        this.key = key;
+    }
 
-        final var sql = String.format("UPDATE %s SET locator = ? WHERE %s = ? AND mod_content = ?", table, DbMailItem.IN_THIS_MAILBOX_AND + idColumn);
-        int numRows = com.zimbra.cs.db.DbUtil.executeUpdate(sql,
-            volumeId,
-            info.getId(),
-            info.getModifyContent()
-        );
+    public String getBucketName() {
+        return bucketName;
+    }
 
-        return numRows == 1;
+    public String getKey() {
+        return key;
     }
 }

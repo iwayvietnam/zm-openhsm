@@ -37,15 +37,15 @@ public class MovedItem {
 
     private final String blobDigest;
 
-    private final MailboxBlob oldBlob;
+    private MailboxBlob oldBlob;
 
-    private final MailboxBlob newBlob;
+    private MailboxBlob newBlob;
 
     private final boolean fromDumpster;
 
     private final boolean fromRevision;
 
-    private final String locator;
+    private String locator;
 
     public MovedItem(
         int id,
@@ -55,18 +55,14 @@ public class MovedItem {
         MailboxBlob oldBlob,
         MailboxBlob newBlob,
         boolean fromDumpster,
-        boolean fromRevision,
-        String locator
+        boolean fromRevision
     ) {
         this.id = id;
         this.volumeId = volumeId;
         this.modifyContent = modifyContent;
         this.blobDigest = blobDigest;
-        this.oldBlob = oldBlob;
-        this.newBlob = newBlob;
         this.fromDumpster = fromDumpster;
         this.fromRevision = fromRevision;
-        this.locator = locator;
     }
 
     public int getId() {
@@ -88,9 +84,16 @@ public class MovedItem {
     public MailboxBlob getOldBlob() {
         return oldBlob;
     }
+    public void setOldBlob(MailboxBlob oldBlob) {
+        this.oldBlob = oldBlob;
+    }
 
     public MailboxBlob getNewBlob() {
         return newBlob;
+    }
+
+    public void setNewBlob(MailboxBlob newBlob) {
+        this.newBlob = newBlob;
     }
 
     public boolean fromDumpster() {
@@ -103,5 +106,13 @@ public class MovedItem {
 
     public String getLocator() {
         return this.locator;
+    }
+
+    public void setLocator(String locator) {
+        this.locator = locator;
+    }
+
+    public String toString() {
+        return String.format("MovedItem: {id=%d, vol=%d, modContent=%d, digest=%s, dumpster=%s, revision=%s, locator=%s}", id, volumeId, modifyContent, blobDigest, Boolean.toString(fromDumpster), Boolean.toString(fromRevision), this.locator);
     }
 }

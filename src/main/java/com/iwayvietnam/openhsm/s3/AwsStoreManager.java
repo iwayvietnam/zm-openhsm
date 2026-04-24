@@ -23,8 +23,7 @@
 package com.iwayvietnam.openhsm.s3;
 
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
-import com.iwayvietnam.openhsm.locator.LocatorUtil;
-import com.iwayvietnam.openhsm.locator.S3Locator;
+import com.iwayvietnam.openhsm.util.LocatorUtil;
 import com.iwayvietnam.openhsm.util.Log;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.cs.mailbox.Mailbox;

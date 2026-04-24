@@ -20,11 +20,12 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.openhsm.locator;
+package com.iwayvietnam.openhsm.util;
 
 import com.iwayvietnam.openhsm.config.Configuration;
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
 import com.iwayvietnam.openhsm.config.SettingsConstants;
+import com.iwayvietnam.openhsm.s3.S3Locator;
 import com.zimbra.cs.mailbox.Mailbox;
 
 import java.util.UUID;
