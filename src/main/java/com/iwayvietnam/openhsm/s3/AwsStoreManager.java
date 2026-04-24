@@ -1,6 +1,6 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * Zm S3 is the ECS S3 compatible store extension for Zimbra Collaboration Open Source Edition..
+ * Zm OpenHSM is the the Hierarchical Storage Management extension for Zimbra Collaboration Open Source Edition..
  * Copyright (C) 2026-present iWay Vietnam and/or its affiliates. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  * ***** END LICENSE BLOCK *****
  *
- * Zimbra S3
+ * Zimbra OpenHSM
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
@@ -25,8 +25,8 @@ package com.iwayvietnam.openhsm.s3;
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
 import com.iwayvietnam.openhsm.locator.LocatorUtil;
 import com.iwayvietnam.openhsm.locator.S3Locator;
+import com.iwayvietnam.openhsm.util.Log;
 import com.zimbra.common.service.ServiceException;
-import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.mailbox.Mailbox;
 import com.zimbra.cs.store.external.ExternalStoreManager;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -55,7 +55,7 @@ public class AwsStoreManager extends ExternalStoreManager  {
 
     @Override
     public void startup() throws IOException, ServiceException {
-        ZimbraLog.store.info("Starting up Aws Store Manager");
+        Log.openhsm.info("Starting up Aws Store Manager");
         super.startup();
         var config = PropertiesConfiguration.getInstance();
         try {
@@ -74,7 +74,7 @@ public class AwsStoreManager extends ExternalStoreManager  {
 
     @Override
     public void shutdown() {
-        ZimbraLog.store.info("Shutting down Aws Store Manager");
+        Log.openhsm.info("Shutting down Aws Store Manager");
         super.shutdown();
         bucketNames.clear();
         try {
@@ -87,7 +87,7 @@ public class AwsStoreManager extends ExternalStoreManager  {
 
     @Override
     public String writeStreamToStore(InputStream in, long actualSize, Mailbox mailbox) throws IOException, ServiceException {
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "writeStreamToStore - start: actualSize - %s, accountId - %s", actualSize, mailbox.getAccountId()
         ));
         var locator = LocatorUtil.generateLocator(mailbox);
@@ -102,7 +102,7 @@ public class AwsStoreManager extends ExternalStoreManager  {
         );
 
         String stringLocator = LocatorUtil.toStringLocator(locator);
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "writeStreamToStore() - end: locator - %s", stringLocator)
         );
         return stringLocator;
@@ -110,12 +110,12 @@ public class AwsStoreManager extends ExternalStoreManager  {
 
     @Override
     public InputStream readStreamFromStore(String locator, Mailbox mailbox) throws IOException {
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "readStreamFromStore() - start: locator - %s, accountId - %s", locator, mailbox.getAccountId()
         ));
 
         var el = LocatorUtil.fromStringLocator(locator);
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "readStreamFromStore() - reading: bucket - %s, key - %s", el.getBucketName(), el.getKey())
         );
 
@@ -128,11 +128,11 @@ public class AwsStoreManager extends ExternalStoreManager  {
 
     @Override
     public boolean deleteFromStore(String locator, Mailbox mailbox) throws IOException {
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "deleteFromStore() - start: locator - %s, accountId - %s", locator, mailbox.getAccountId())
         );
         var el = LocatorUtil.fromStringLocator(locator);
-        ZimbraLog.store.debug(String.format(
+        Log.openhsm.debug(String.format(
             "deleteFromStore() - deleting: bucket - %s, key - %s", el.getBucketName(), el.getKey())
         );
 

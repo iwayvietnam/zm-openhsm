@@ -1,6 +1,6 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * Zm S3 is the ECS S3 compatible store extension for Zimbra Collaboration Open Source Edition..
+ * Zm OpenHSM is the the Hierarchical Storage Management extension for Zimbra Collaboration Open Source Edition..
  * Copyright (C) 2026-present iWay Vietnam and/or its affiliates. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,15 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  * ***** END LICENSE BLOCK *****
  *
- * Zimbra S3
+ * Zimbra OpenHSM
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
 package com.iwayvietnam.openhsm.config;
 
+import com.iwayvietnam.openhsm.util.Log;
 import com.zimbra.common.localconfig.LC;
 import com.zimbra.common.util.StringUtil;
-import com.zimbra.common.util.ZimbraLog;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -104,14 +104,14 @@ public class PropertiesConfiguration implements Configuration {
     }
 
     private static void loadSettingsFromProperties() {
-        ZimbraLog.extensions.info("Load config properties");
+        Log.openhsm.info("Load config properties");
         try {
             final var confDir = Paths.get(LC.zimbra_home.value(), "conf").toString();
             final var prop = new Properties();
             prop.load(new FileInputStream(confDir + "/" + SettingsConstants.ZM_S3_CONFIG_FILE));
             prop.stringPropertyNames().forEach(key -> properties.put(key, prop.getProperty(key)));
         } catch (IOException e) {
-            ZimbraLog.extensions.error(e);
+            Log.openhsm.error(e);
         }
     }
 }

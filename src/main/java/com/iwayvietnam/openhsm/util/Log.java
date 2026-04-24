@@ -20,12 +20,10 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.openhsm.mover;
+package com.iwayvietnam.openhsm.util;
 
-/**
- * Blob mover interface
- * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
- */
-public interface BlobMover {
-    void moveBlobs();
+import com.zimbra.common.util.LogFactory;
+
+public class Log {
+    public static final com.zimbra.common.util.Log openhsm = LogFactory.getLog("zimbra.openhsm");
 }

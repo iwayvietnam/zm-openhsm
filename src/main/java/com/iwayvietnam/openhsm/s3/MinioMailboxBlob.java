@@ -1,6 +1,6 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * Zm S3 is the ECS S3 compatible store extension for Zimbra Collaboration Open Source Edition..
+ * Zm OpenHSM is the the Hierarchical Storage Management extension for Zimbra Collaboration Open Source Edition..
  * Copyright (C) 2026-present iWay Vietnam and/or its affiliates. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>
  * ***** END LICENSE BLOCK *****
  *
- * Zimbra S3
+ * Zimbra OpenHSM
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
 package com.iwayvietnam.openhsm.s3;
 
-import com.zimbra.common.util.ZimbraLog;
+import com.iwayvietnam.openhsm.util.Log;
 import com.zimbra.cs.mailbox.Mailbox;
 import com.zimbra.cs.store.StoreManager;
 import com.zimbra.cs.store.external.ExternalMailboxBlob;
@@ -43,7 +43,7 @@ public class MinioMailboxBlob extends ExternalMailboxBlob {
         try {
             status = ((MinioStoreManager) StoreManager.getInstance()).validate(getLocator(), getMailbox());
         } catch (Exception e) {
-            ZimbraLog.store.warn(String.format("Failed to validate - %s", getLocator()), e);
+            Log.openhsm.warn(String.format("Failed to validate - %s", getLocator()), e);
         }
 
         return status;
