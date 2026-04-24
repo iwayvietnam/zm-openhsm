@@ -52,8 +52,6 @@ public class MovedItem {
         short volumeId,
         int modifyContent,
         String blobDigest,
-        MailboxBlob oldBlob,
-        MailboxBlob newBlob,
         boolean fromDumpster,
         boolean fromRevision
     ) {

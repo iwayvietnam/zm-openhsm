@@ -50,6 +50,7 @@ public class DbHelper {
         );
         final var numRows = DbUtil.executeUpdate(sql,
             volumeId,
+            mbox.getId(),
             info.getId(),
             info.getModifyContent()
         );
@@ -59,21 +60,99 @@ public class DbHelper {
 
     public static Collection<MovedItem> getItems(Mailbox mbox, List<Integer> itemIds, List<Short> volumeIds, boolean fromDumpster) throws ServiceException {
         List<MovedItem> items = new ArrayList<>();
-        String table = null;
 
         for(var i = 0; i < itemIds.size(); i += Db.getINClauseBatchSize()) {
-            table = DbMailItem.getMailItemTableName(mbox, fromDumpster);
-            int count = Math.min(Db.getINClauseBatchSize(), itemIds.size() - i);
-//            String sql = "SELECT id, locator, mod_content, blob_digest  FROM " + table + " WHERE " + DbMailItem.IN_THIS_MAILBOX_AND + "blob_digest IS NOT NULL AND locator IN " + com.zimbra.cs.db.DbUtil.suitableNumberOfVariables(volumeIds) + " AND id IN " + com.zimbra.cs.db.DbUtil.suitableNumberOfVariables(count);
-            final var sql = String.format(
+            var table = DbMailItem.getMailItemTableName(mbox, fromDumpster);
+            var count = Math.min(Db.getINClauseBatchSize(), itemIds.size() - i);
+            var sql = String.format(
                 "SELECT id, locator, mod_content, blob_digest FROM %s WHERE %s IS NOT NULL AND locator IN %s AND id IN %s",
                 table,
                 DbMailItem.IN_THIS_MAILBOX_AND + "blob_digest",
-                DbUtil.suitableNumberOfVariables(volumeIds),
-                DbUtil.suitableNumberOfVariables(count)
+                inVolumeIds(volumeIds),
+                inItemIds(itemIds, i, count)
             );
-            final var results = DbUtil.executeQuery(sql);
+            var rs = DbUtil.executeQuery(sql, mbox.getId());
+            while(rs.next()) {
+                var id = rs.getInt("id");
+                var volumeId = (short) rs.getInt("locator");
+                var revision = rs.getInt("mod_content");
+                String blobDigest = rs.getString("blob_digest");
+                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                items.add(item);
+            }
+
+            table = DbMailItem.getRevisionTableName(mbox, fromDumpster);
+            sql = String.format(
+                "SELECT item_id, locator, mod_content, blob_digest FROM %s WHERE %s IS NOT NULL AND locator IN %s AND item_id IN %s",
+                table,
+                DbMailItem.IN_THIS_MAILBOX_AND + "blob_digest",
+                inVolumeIds(volumeIds),
+                inItemIds(itemIds, i, count)
+            );
+            rs = DbUtil.executeQuery(sql, mbox.getId());
+            while(rs.next()) {
+                var id = rs.getInt("item_id");
+                var volumeId = (short) rs.getInt("locator");
+                var revision = rs.getInt("mod_content");
+                String blobDigest = rs.getString("blob_digest");
+                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                items.add(item);
+            }
         }
         return items;
+    }
+
+    public static Collection<MovedItem> getItemsRevisions(Mailbox mbox, List<Integer> itemIds, List<Short> volumeIds, boolean fromDumpster) throws ServiceException {
+        List<MovedItem> items = new ArrayList<>();
+
+        for(var i = 0; i < itemIds.size(); i += Db.getINClauseBatchSize()) {
+            var count = Math.min(Db.getINClauseBatchSize(), itemIds.size() - i);
+            var table = DbMailItem.getRevisionTableName(mbox, fromDumpster);
+            var sql = String.format(
+                    "SELECT item_id, locator, mod_content, blob_digest FROM %s WHERE %s IS NOT NULL AND locator IN %s AND item_id IN %s",
+                    table,
+                    DbMailItem.IN_THIS_MAILBOX_AND + "blob_digest",
+                    inVolumeIds(volumeIds),
+                    inItemIds(itemIds, i, count)
+            );
+            var rs = DbUtil.executeQuery(sql, mbox.getId());
+            while(rs.next()) {
+                var id = rs.getInt("item_id");
+                var volumeId = (short) rs.getInt("locator");
+                var revision = rs.getInt("mod_content");
+                String blobDigest = rs.getString("blob_digest");
+                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    private static String inVolumeIds(List<Short> list) {
+        var sb = new StringBuilder("(");
+        for (var i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                sb.append(list.get(i));
+            }
+            else {
+                sb.append(", ").append(list.get(i));
+            }
+        }
+
+        return sb.append(")").toString();
+    }
+
+    private static String inItemIds(List<Integer> list, int index, int count) {
+        var sb = new StringBuilder("(");
+        for (var i = index; i < index + count; i++) {
+            if (i == 0) {
+                sb.append(list.get(i));
+            }
+            else {
+                sb.append(", ").append(list.get(i));
+            }
+        }
+
+        return sb.append(")").toString();
     }
 }
