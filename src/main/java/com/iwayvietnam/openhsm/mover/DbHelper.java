@@ -38,17 +38,17 @@ import java.util.List;
  */
 public class DbHelper {
     public static boolean alterVolume(Mailbox mbox, MovedItem info, int volumeId) throws ServiceException {
-        final var table = info.fromRevision() ?
+        var table = info.fromRevision() ?
             DbMailItem.getRevisionTableName(mbox, info.fromDumpster()) :
             DbMailItem.getMailItemTableName(mbox, info.fromDumpster());
-        final var idColumn = info.fromRevision() ? "item_id" : "id";
+        var idColumn = info.fromRevision() ? "item_id" : "id";
 
-        final var sql = String.format(
+        var sql = String.format(
             "UPDATE %s SET locator = ? WHERE %s = ? AND mod_content = ?",
             table,
             DbMailItem.IN_THIS_MAILBOX_AND + idColumn
         );
-        final var numRows = DbUtil.executeUpdate(sql,
+        var numRows = DbUtil.executeUpdate(sql,
             volumeId,
             mbox.getId(),
             info.getId(),
@@ -59,7 +59,7 @@ public class DbHelper {
     }
 
     public static Collection<MovedItem> getItems(Mailbox mbox, List<Integer> itemIds, List<Short> volumeIds, boolean fromDumpster) throws ServiceException {
-        List<MovedItem> items = new ArrayList<>();
+        var items = new ArrayList<MovedItem>();
 
         for(var i = 0; i < itemIds.size(); i += Db.getINClauseBatchSize()) {
             var table = DbMailItem.getMailItemTableName(mbox, fromDumpster);
@@ -76,8 +76,8 @@ public class DbHelper {
                 var id = rs.getInt("id");
                 var volumeId = (short) rs.getInt("locator");
                 var revision = rs.getInt("mod_content");
-                String blobDigest = rs.getString("blob_digest");
-                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                var blobDigest = rs.getString("blob_digest");
+                var item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
                 items.add(item);
             }
 
@@ -94,8 +94,8 @@ public class DbHelper {
                 var id = rs.getInt("item_id");
                 var volumeId = (short) rs.getInt("locator");
                 var revision = rs.getInt("mod_content");
-                String blobDigest = rs.getString("blob_digest");
-                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                var blobDigest = rs.getString("blob_digest");
+                var item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
                 items.add(item);
             }
         }
@@ -103,7 +103,7 @@ public class DbHelper {
     }
 
     public static Collection<MovedItem> getItemsRevisions(Mailbox mbox, List<Integer> itemIds, List<Short> volumeIds, boolean fromDumpster) throws ServiceException {
-        List<MovedItem> items = new ArrayList<>();
+        var items = new ArrayList<MovedItem>();
 
         for(var i = 0; i < itemIds.size(); i += Db.getINClauseBatchSize()) {
             var count = Math.min(Db.getINClauseBatchSize(), itemIds.size() - i);
@@ -120,8 +120,8 @@ public class DbHelper {
                 var id = rs.getInt("item_id");
                 var volumeId = (short) rs.getInt("locator");
                 var revision = rs.getInt("mod_content");
-                String blobDigest = rs.getString("blob_digest");
-                MovedItem item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
+                var blobDigest = rs.getString("blob_digest");
+                var item = new MovedItem(id, volumeId, revision, blobDigest, fromDumpster, false);
                 items.add(item);
             }
         }

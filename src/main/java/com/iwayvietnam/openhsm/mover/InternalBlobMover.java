@@ -28,18 +28,15 @@ import com.zimbra.common.account.Key;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.StringUtil;
 import com.zimbra.common.util.ZimbraLog;
-import com.zimbra.cs.account.Account;
 import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.index.SortBy;
 import com.zimbra.cs.mailbox.*;
 import com.zimbra.cs.store.MailboxBlob;
 import com.zimbra.cs.store.StoreManager;
 import com.zimbra.cs.store.file.FileBlobStore;
-import com.zimbra.cs.volume.Volume;
 import com.zimbra.cs.volume.VolumeManager;
 import com.zimbra.znative.IO;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,17 +54,15 @@ public class InternalBlobMover implements BlobMover {
 
     public MoverState moveBlobs(String query, Set<MailItem.Type> types, List<Short> sourceVolumeIds, short destVolumeId, Long maxBytes, int mboxId, String accountId) throws ServiceException {
         this.validateVolume(destVolumeId);
-        for(short volumeId : sourceVolumeIds) {
+        for(var volumeId : sourceVolumeIds) {
             this.validateVolume(volumeId);
         }
         Log.openhsm.info(
             "Moving blobs matching query '%s' for type(s) %s from volume(s) %s to volume %d.",
             query,
-            new Object[]{
-                MailItem.Type.toString(types),
-                StringUtil.join(", ", sourceVolumeIds),
-                state.getDestVolumeId()
-            }
+            MailItem.Type.toString(types),
+            StringUtil.join(", ", sourceVolumeIds),
+            state.getDestVolumeId()
         );
 
         state.setQuery(query);
@@ -118,9 +113,9 @@ public class InternalBlobMover implements BlobMover {
         return state;
     }
 
-    private void safeMoveBlobs(Mailbox mbox, Collection<MovedItem> items) throws ServiceException {
+    private void safeMoveBlobs(Mailbox mbox, List<MovedItem> items) throws ServiceException {
         var mboxId = mbox.getId();
-        var existing = (Integer)mailboxGuard.putIfAbsent(mboxId, mboxId);
+        var existing = mailboxGuard.putIfAbsent(mboxId, mboxId);
         if (existing != null) {
             throw ServiceException.FAILURE(
                 "Two threads attempted to move blobs in mailbox " + mboxId,
@@ -128,18 +123,23 @@ public class InternalBlobMover implements BlobMover {
             );
         } else {
             try {
-                int fromIndex = 0;
-                int totalSize = items.size();
-                Log.openhsm.info("Moving %d items in mailbox %d with batch size %d.", new Object[]{totalSize, mbox.getId(), this.batchSize});
+                var fromIndex = 0;
+                var totalSize = items.size();
+                Log.openhsm.info(
+                    "Moving %d items in mailbox %d with batch size %d.",
+                    totalSize,
+                    mbox.getId(),
+                    this.batchSize
+                );
 
                 while(fromIndex < totalSize) {
-                    int toIndex = fromIndex + this.batchSize;
+                    var toIndex = fromIndex + this.batchSize;
                     if (toIndex > totalSize) {
                         toIndex = totalSize;
                     }
 
-                    List<MovedItem> subList = ((List)items).subList(fromIndex, toIndex);
-                    Collection<MovedItem> batchItems = Collections.unmodifiableCollection(subList);
+                    var subList = items.subList(fromIndex, toIndex);
+                    var batchItems = Collections.unmodifiableCollection(subList);
                     this.moveBlobsInternal(mbox, batchItems);
                     if (state.wasAborted()) {
                         break;
@@ -160,9 +160,9 @@ public class InternalBlobMover implements BlobMover {
         Log.openhsm.info("Moving blobs for %d items in mailbox %d to volume %d.", new Object[]{items.size(), mbox.getId(), destVolumeId});
 
         var numMoved = 0;
-        Map<String, MailboxBlob> linkedNewBlobs = new HashMap<>();
-        Set<MailboxBlob> unprocessedNewBlobs = new HashSet<>();
-        Set<MailboxBlob> blobsToDelete = new HashSet<>();
+        var linkedNewBlobs = new HashMap<String, MailboxBlob>();
+        var unprocessedNewBlobs = new HashSet<MailboxBlob>();
+        var blobsToDelete = new HashSet<MailboxBlob>();
 
         try {
             for(var item : items) {
@@ -176,18 +176,22 @@ public class InternalBlobMover implements BlobMover {
                 var volumeId = Short.toString(item.getVolumeId());
                 var oldBlob = storeManager.getMailboxBlob(mbox, item.getId(), item.getModifyContent(), volumeId);
                 if (oldBlob != null) {
-                    MailboxBlob newBlob = null;
+                    MailboxBlob newBlob;
 
                     try {
-                        MailboxBlob copiedBlob = (MailboxBlob)allLinkedNewBlobs.get(item.getBlobDigest());
+                        var copiedBlob = allLinkedNewBlobs.get(item.getBlobDigest());
                         if (copiedBlob == null) {
-                            copiedBlob = (MailboxBlob)linkedNewBlobs.get(item.getBlobDigest());
+                            copiedBlob = linkedNewBlobs.get(item.getBlobDigest());
                         }
 
                         if (copiedBlob != null) {
-                            File file = copiedBlob.getLocalBlob().getFile();
+                            var file = copiedBlob.getLocalBlob().getFile();
                             if (!file.exists()) {
-                                Log.openhsm.info("Unable to link to %s because the file was deleted.  %s", new Object[]{file.getPath(), item});
+                                Log.openhsm.info(
+                                    "Unable to link to %s because the file was deleted. %s",
+                                    file.getPath(),
+                                    item
+                                );
                                 allLinkedNewBlobs.remove(item.getBlobDigest());
                                 linkedNewBlobs.remove(item.getBlobDigest());
                                 copiedBlob = null;
@@ -198,9 +202,12 @@ public class InternalBlobMover implements BlobMover {
                             newBlob = storeManager.link(copiedBlob.getLocalBlob(), mbox, item.getId(), item.getModifyContent(), destVolumeId);
                         } else {
                             newBlob = storeManager.copy(oldBlob.getLocalBlob(), mbox, item.getId(), item.getModifyContent(), destVolumeId);
-                            long newBlobSize = ((MailboxBlob)newBlob).getLocalBlob().getFile().length();
+                            var newBlobSize = newBlob.getLocalBlob().getFile().length();
                             if (state.getNumBytesMoved() + newBlobSize > state.getMaxBytes()) {
-                                Log.openhsm.info("Exceeded limit of %d bytes.  Aborting BlobMover.", new Object[]{state.getMaxBytes()});
+                                Log.openhsm.info(
+                                    "Exceeded limit of %d bytes.  Aborting BlobMover.",
+                                    state.getMaxBytes()
+                                );
                                 storeManager.delete(newBlob);
                                 state.setShouldAbort(true);
                                 continue;
@@ -209,7 +216,10 @@ public class InternalBlobMover implements BlobMover {
                             state.incrementNumBytesMoved(newBlobSize);
                         }
                     } catch (IOException e) {
-                        throw ServiceException.FAILURE("Unable to copy " + oldBlob + " to volume " + destVolumeId, e);
+                        throw ServiceException.FAILURE(
+                            "Unable to copy " + oldBlob + " to volume " + destVolumeId,
+                            e
+                        );
                     }
 
                     unprocessedNewBlobs.add(newBlob);
@@ -227,7 +237,12 @@ public class InternalBlobMover implements BlobMover {
                         linkedNewBlobs.put(item.getBlobDigest(), newBlob);
                     }
                 } else {
-                    Log.openhsm.warn("Could not find blob for item %d, revision %d on volume %d.", new Object[]{item.getId(), item.getModifyContent(), item.getVolumeId()});
+                    Log.openhsm.warn(
+                        "Could not find blob for item %d, revision %d on volume %d.",
+                        item.getId(),
+                        item.getModifyContent(),
+                        item.getVolumeId()
+                    );
                 }
             }
 
@@ -241,12 +256,15 @@ public class InternalBlobMover implements BlobMover {
                         unprocessedNewBlobs.remove(item.getNewBlob());
                         ++numMoved;
                     } else {
-                        Log.openhsm.info("Data was changed while HSM was running.  Not moving blob.  %s.", new Object[]{item});
+                        Log.openhsm.info(
+                            "Data was changed while HSM was running. Not moving blob.  %s.",
+                            item
+                        );
                         blobsToDelete.add(item.getNewBlob());
                         linkedNewBlobs.remove(item.getBlobDigest());
                     }
                 } else {
-                    Log.openhsm.debug("Skipping blob after abort: %s.", new Object[]{item});
+                    Log.openhsm.debug("Skipping blob after abort: %s.", item);
                 }
             }
 
@@ -263,7 +281,10 @@ public class InternalBlobMover implements BlobMover {
             if (numMoved > 0) {
                 mbox.purge(MailItem.Type.MESSAGE);
             }
-            Log.openhsm.info("Finished moving blobs for %d items in mailbox %d to volume %d.", new Object[]{items.size(), mbox.getId(), destVolumeId});
+            Log.openhsm.info(
+                "Finished moving blobs for %d items in mailbox %d to volume %d.",
+                new Object[]{items.size(), mbox.getId(), destVolumeId}
+            );
         }
     }
 
@@ -276,7 +297,7 @@ public class InternalBlobMover implements BlobMover {
     }
 
     private boolean isLocalMailbox(String accountId) throws ServiceException {
-        Account account = Provisioning.getInstance().get(Key.AccountBy.id, accountId);
+        var account = Provisioning.getInstance().get(Key.AccountBy.id, accountId);
         if (account == null) {
             Log.openhsm.warn("Unable to look up account %s.", accountId);
             return false;
@@ -286,7 +307,7 @@ public class InternalBlobMover implements BlobMover {
     }
 
     private void validateVolume(short volumeId) throws ServiceException {
-        Volume vol = VolumeManager.getInstance().getVolume(volumeId);
+        var vol = VolumeManager.getInstance().getVolume(volumeId);
         if (vol.getType() != 1 && vol.getType() != 2) {
             throw ServiceException.FAILURE("Volume is invalid: " + vol, null);
         }
