@@ -30,11 +30,8 @@ import com.zimbra.common.util.StringUtil;
 import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.account.Account;
 import com.zimbra.cs.account.Provisioning;
-import com.zimbra.cs.hsm.MovedItemInfo;
-import com.zimbra.cs.mailbox.MailItem;
-import com.zimbra.cs.mailbox.Mailbox;
-import com.zimbra.cs.mailbox.MailboxManager;
-import com.zimbra.cs.mailbox.MessageCache;
+import com.zimbra.cs.index.SortBy;
+import com.zimbra.cs.mailbox.*;
 import com.zimbra.cs.store.MailboxBlob;
 import com.zimbra.cs.store.StoreManager;
 import com.zimbra.cs.store.file.FileBlobStore;
@@ -55,8 +52,8 @@ import java.util.concurrent.ConcurrentMap;
 public class InternalBlobMover implements BlobMover {
     private final MoverState state = new MoverState();
     private final Map<String, MailboxBlob> allLinkedNewBlobs = new HashMap<>();
-    private int batchSize = PropertiesConfiguration.getInstance().getHsmBatchSize();
-    private static ConcurrentMap<Integer, Integer> mailboxGuard = new ConcurrentHashMap();
+    private final int batchSize = PropertiesConfiguration.getInstance().getHsmBatchSize();
+    private static final ConcurrentMap<Integer, Integer> mailboxGuard = new ConcurrentHashMap<>();
 
     public MoverState moveBlobs(String query, Set<MailItem.Type> types, List<Short> sourceVolumeIds, short destVolumeId, Long maxBytes, int mboxId, String accountId) throws ServiceException {
         this.validateVolume(destVolumeId);
@@ -88,8 +85,36 @@ public class InternalBlobMover implements BlobMover {
             );
             return this.state;
         }
-        Mailbox mbox = MailboxManager.getInstance().getMailboxById(mboxId);
-        Account account = mbox.getAccount();
+        var mbox = MailboxManager.getInstance().getMailboxById(mboxId);
+        var account = mbox.getAccount();
+        ZimbraLog.addAccountNameToContext(account.getName());
+        var items = new ArrayList<MovedItem>();
+        var dumpsterOrNot = new boolean[]{false, true};
+
+        for(var fromDumpster : dumpsterOrNot) {
+            var itemIds = new ArrayList<Integer>();
+            try (var results = mbox.index.search(new OperationContext(mbox), query, types, SortBy.NONE, 10000, fromDumpster)) {
+                while(results.hasNext()) {
+                    itemIds.add(results.getNext().getItemId());
+                }
+            } catch (Exception e) {
+                Log.openhsm.warn("Search '%s' failed.  Skipping mailbox.", query, e);
+                continue;
+            }
+            if (!itemIds.isEmpty()) {
+                items.addAll(DbHelper.getItems(mbox, itemIds, sourceVolumeIds, fromDumpster));
+            }
+            if (Provisioning.getInstance().getLocalServer().isHsmMovePreviousRevisions()) {
+                items.addAll(DbHelper.getItemsRevisions(mbox, itemIds, sourceVolumeIds, fromDumpster));
+            }
+            if (!items.isEmpty()) {
+                this.safeMoveBlobs(mbox, items);
+            }
+            if (state.wasAborted()) {
+                Log.openhsm.warn("Aborting blob mover session");
+                return state;
+            }
+        }
         return state;
     }
 
@@ -143,7 +168,7 @@ public class InternalBlobMover implements BlobMover {
             for(var item : items) {
                 if (state.shouldAbort()) {
                     state.setWasAborted(true);
-                    Log.openhsm.warn("Aborting BlobMover session");
+                    Log.openhsm.warn("Aborting blob mover session");
                     break;
                 }
 

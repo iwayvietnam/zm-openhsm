@@ -41,6 +41,13 @@
             <systemPath>${zimbra.lib.dir}/zimbrastore.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.zimbra.cs</groupId>
+            <artifactId>zimbra-native</artifactId>
+            <version>${zimbra.version}</version>
+            <scope>system</scope>
+            <systemPath>${zimbra.lib.dir}/zimbra-native.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
