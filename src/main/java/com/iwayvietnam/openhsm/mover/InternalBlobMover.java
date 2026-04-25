@@ -290,7 +290,7 @@ public class InternalBlobMover implements BlobMover {
 
     private static void deleteBlobs(Collection<MailboxBlob> mblobs) {
         if (mblobs != null) {
-            for(MailboxBlob mblob : mblobs) {
+            for(var mblob : mblobs) {
                 StoreManager.getReaderSMInstance(mblob.getLocator()).quietDelete(mblob);
             }
         }

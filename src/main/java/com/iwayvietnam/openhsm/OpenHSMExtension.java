@@ -28,11 +28,11 @@ import com.zimbra.cs.extension.ExtensionException;
 import com.zimbra.cs.extension.ZimbraExtension;
 
 /**
- * Zimbra OpenHSM
+ * Zimbra Open HSM Extension
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
 public class OpenHSMExtension implements ZimbraExtension {
-    public static final String EXTENSION_NAME = "openhsm-store-manager";
+    public static final String EXTENSION_NAME = "zm-openhsm";
     @Override
 
     public String getName() {
@@ -41,11 +41,11 @@ public class OpenHSMExtension implements ZimbraExtension {
 
     @Override
     public void init() throws ExtensionException, ServiceException {
-        Log.openhsm.info("OpenHSM: initializing OpenHSM Extension");
+        Log.openhsm.info("OpenHSM: initializing Open HSM Extension");
     }
 
     @Override
     public void destroy() {
-        Log.openhsm.info("OpenHSM: destroying OpenHSM Extension");
+        Log.openhsm.info("OpenHSM: destroying Open HSM Extension");
     }
 }
