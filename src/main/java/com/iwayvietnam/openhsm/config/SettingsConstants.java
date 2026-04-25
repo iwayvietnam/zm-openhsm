@@ -28,11 +28,13 @@ package com.iwayvietnam.openhsm.config;
  */
 public final class SettingsConstants {
     public static final String ZIMBRA = "zimbra";
-    public static final String ZM_S3_CONFIG_FILE = "zm.openhsm.properties";
+    public static final String ZM_OPENHSM_CONFIG_FILE = "zm.openhsm.properties";
 
     public static final String ZM_S3_ENDPOINT = "s3.endpoint";
     public static final String ZM_S3_ACCESS_KEY = "s3.accessKey";
     public static final String ZM_S3_SECRET_KEY = "s3.secretKey";
     public static final String ZM_S3_STORE_NAME = "s3.storeName";
     public static final String ZM_S3_DELETE_THREADS = "s3.deleteThreads";
+
+    public static final String ZM_HSM_BATCH_SIZE = "hsm.batchSize";
 }

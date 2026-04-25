@@ -46,6 +46,7 @@ public class PropertiesConfiguration implements Configuration {
     private final String secretKey;
     private final String storeName;
     private final int deleteThreads;
+    private final int hsmBatchSize;
 
     private PropertiesConfiguration()
     {
@@ -56,6 +57,7 @@ public class PropertiesConfiguration implements Configuration {
         secretKey = loadStringProperty(SettingsConstants.ZM_S3_SECRET_KEY);
         storeName = loadStringProperty(SettingsConstants.ZM_S3_STORE_NAME);
         deleteThreads = loadIntProperty(SettingsConstants.ZM_S3_DELETE_THREADS);
+        hsmBatchSize = loadIntProperty(SettingsConstants.ZM_HSM_BATCH_SIZE);
     }
 
     private static final class InstanceHolder {
@@ -91,6 +93,11 @@ public class PropertiesConfiguration implements Configuration {
         return deleteThreads;
     }
 
+    @Override
+    public int getHsmBatchSize() {
+        return hsmBatchSize;
+    }
+
     private static String loadStringProperty(final String key) {
         return properties.get(key);
     }
@@ -108,7 +115,7 @@ public class PropertiesConfiguration implements Configuration {
         try {
             final var confDir = Paths.get(LC.zimbra_home.value(), "conf").toString();
             final var prop = new Properties();
-            prop.load(new FileInputStream(confDir + "/" + SettingsConstants.ZM_S3_CONFIG_FILE));
+            prop.load(new FileInputStream(confDir + "/" + SettingsConstants.ZM_OPENHSM_CONFIG_FILE));
             prop.stringPropertyNames().forEach(key -> properties.put(key, prop.getProperty(key)));
         } catch (IOException e) {
             Log.openhsm.error(e);
