@@ -54,13 +54,13 @@ public class PropertiesConfiguration implements Configuration {
     {
         loadSettingsFromProperties();
 
-        endpoint = loadStringProperty(SettingsConstants.ZM_S3_ENDPOINT);
-        accessKey = loadStringProperty(SettingsConstants.ZM_S3_ACCESS_KEY);
-        secretKey = loadStringProperty(SettingsConstants.ZM_S3_SECRET_KEY);
-        storeName = loadStringProperty(SettingsConstants.ZM_S3_STORE_NAME);
-        deleteThreads = loadIntProperty(SettingsConstants.ZM_S3_DELETE_THREADS);
-        hsmBatchSize = loadIntProperty(SettingsConstants.ZM_HSM_BATCH_SIZE);
-        parallelismLevel = loadIntProperty(SettingsConstants.ZM_HSM_PARALLELISM_LEVEL, PARALLELISM_LEVEL);
+        endpoint = loadStringProperty(ConfigConstants.ZM_S3_ENDPOINT);
+        accessKey = loadStringProperty(ConfigConstants.ZM_S3_ACCESS_KEY);
+        secretKey = loadStringProperty(ConfigConstants.ZM_S3_SECRET_KEY);
+        storeName = loadStringProperty(ConfigConstants.ZM_S3_STORE_NAME);
+        deleteThreads = loadIntProperty(ConfigConstants.ZM_S3_DELETE_THREADS);
+        hsmBatchSize = loadIntProperty(ConfigConstants.ZM_HSM_BATCH_SIZE);
+        parallelismLevel = loadIntProperty(ConfigConstants.ZM_HSM_PARALLELISM_LEVEL, PARALLELISM_LEVEL);
     }
 
     private static final class InstanceHolder {
@@ -127,7 +127,7 @@ public class PropertiesConfiguration implements Configuration {
         try {
             final var confDir = Paths.get(LC.zimbra_home.value(), "conf").toString();
             final var prop = new Properties();
-            prop.load(new FileInputStream(confDir + "/" + SettingsConstants.ZM_OPENHSM_CONFIG_FILE));
+            prop.load(new FileInputStream(confDir + "/" + ConfigConstants.ZM_OPENHSM_CONFIG_FILE));
             prop.stringPropertyNames().forEach(key -> properties.put(key, prop.getProperty(key)));
         } catch (IOException e) {
             Log.openhsm.error(e);

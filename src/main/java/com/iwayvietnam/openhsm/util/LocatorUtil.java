@@ -24,7 +24,7 @@ package com.iwayvietnam.openhsm.util;
 
 import com.iwayvietnam.openhsm.config.Configuration;
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
-import com.iwayvietnam.openhsm.config.SettingsConstants;
+import com.iwayvietnam.openhsm.config.ConfigConstants;
 import com.iwayvietnam.openhsm.s3.S3Locator;
 import com.zimbra.cs.mailbox.Mailbox;
 
@@ -59,7 +59,7 @@ public class LocatorUtil {
     }
 
     public static String getBucketNameBase() {
-        return String.format("%s.%s", SettingsConstants.ZIMBRA, getConfiguration().getStoreName());
+        return String.format("%s.%s", ConfigConstants.ZIMBRA, getConfiguration().getStoreName());
     }
 
     private static Configuration getConfiguration(){

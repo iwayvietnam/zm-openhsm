@@ -26,7 +26,7 @@ package com.iwayvietnam.openhsm.config;
  * Settings Constants
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public final class SettingsConstants {
+public final class ConfigConstants {
     public static final String ZIMBRA = "zimbra";
     public static final String ZM_OPENHSM_CONFIG_FILE = "zm.openhsm.properties";
 
