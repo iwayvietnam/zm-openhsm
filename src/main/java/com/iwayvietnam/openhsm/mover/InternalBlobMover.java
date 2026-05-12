@@ -140,8 +140,8 @@ public class InternalBlobMover implements BlobMover {
                         toIndex = totalSize;
                     }
 
-                    var subList = items.subList(fromIndex, toIndex);
-                    var batchItems = Collections.unmodifiableCollection(subList);
+                    final var subList = items.subList(fromIndex, toIndex);
+                    final var batchItems = Collections.unmodifiableCollection(subList);
                     this.moveBlobsInternal(mbox, batchItems);
                     if (state.wasAborted()) {
                         break;
@@ -158,13 +158,13 @@ public class InternalBlobMover implements BlobMover {
     }
 
     private void moveBlobsInternal(Mailbox mbox, Collection<MovedItem> items) throws ServiceException {
-        var destVolumeId = state.getDestVolumeId();
+        final var destVolumeId = state.getDestVolumeId();
         Log.openhsm.info("Moving blobs for %d items in mailbox %d to volume %d.", new Object[]{items.size(), mbox.getId(), destVolumeId});
 
         var numMoved = 0;
-        var linkedNewBlobs = new HashMap<String, MailboxBlob>();
-        var unprocessedNewBlobs = new HashSet<MailboxBlob>();
-        var blobsToDelete = new HashSet<MailboxBlob>();
+        final var linkedNewBlobs = new HashMap<String, MailboxBlob>();
+        final var unprocessedNewBlobs = new HashSet<MailboxBlob>();
+        final var blobsToDelete = new HashSet<MailboxBlob>();
 
         try {
             for(var item : items) {
@@ -174,9 +174,9 @@ public class InternalBlobMover implements BlobMover {
                     break;
                 }
 
-                var storeManager = (FileBlobStore) StoreManager.getReaderSMInstance(item.getVolumeId());
-                var volumeId = Short.toString(item.getVolumeId());
-                var oldBlob = storeManager.getMailboxBlob(mbox, item.getId(), item.getModifyContent(), volumeId);
+                final var storeManager = (FileBlobStore) StoreManager.getReaderSMInstance(item.getVolumeId());
+                final var volumeId = Short.toString(item.getVolumeId());
+                final var oldBlob = storeManager.getMailboxBlob(mbox, item.getId(), item.getModifyContent(), volumeId);
                 if (oldBlob != null) {
                     MailboxBlob newBlob;
 
@@ -187,7 +187,7 @@ public class InternalBlobMover implements BlobMover {
                         }
 
                         if (copiedBlob != null) {
-                            var file = copiedBlob.getLocalBlob().getFile();
+                            final var file = copiedBlob.getLocalBlob().getFile();
                             if (!file.exists()) {
                                 Log.openhsm.info(
                                     "Unable to link to %s because the file was deleted. %s",
@@ -204,7 +204,7 @@ public class InternalBlobMover implements BlobMover {
                             newBlob = storeManager.link(copiedBlob.getLocalBlob(), mbox, item.getId(), item.getModifyContent(), destVolumeId);
                         } else {
                             newBlob = storeManager.copy(oldBlob.getLocalBlob(), mbox, item.getId(), item.getModifyContent(), destVolumeId);
-                            var newBlobSize = newBlob.getLocalBlob().getFile().length();
+                            final var newBlobSize = newBlob.getLocalBlob().getFile().length();
                             if (state.getNumBytesMoved() + newBlobSize > state.getMaxBytes()) {
                                 Log.openhsm.info(
                                     "Exceeded limit of %d bytes.  Aborting BlobMover.",
@@ -227,7 +227,7 @@ public class InternalBlobMover implements BlobMover {
                     unprocessedNewBlobs.add(newBlob);
                     item.setOldBlob(oldBlob);
                     item.setNewBlob(newBlob);
-                    int linkCount = 1;
+                    var linkCount = 1;
 
                     try {
                         linkCount = IO.linkCount(oldBlob.getLocalBlob().getPath());
@@ -274,7 +274,7 @@ public class InternalBlobMover implements BlobMover {
             MailboxHelper.deleteBlobs(blobsToDelete);
             state.incrementNumMoved(numMoved);
             allLinkedNewBlobs.putAll(linkedNewBlobs);
-        } catch (ServiceException e) {
+        } catch (final ServiceException e) {
             state.setError(e);
             MailboxHelper.deleteBlobs(unprocessedNewBlobs);
             MailboxHelper.deleteBlobs(blobsToDelete);
@@ -290,8 +290,8 @@ public class InternalBlobMover implements BlobMover {
         }
     }
 
-    private void validateVolume(short volumeId) throws ServiceException {
-        var vol = VolumeManager.getInstance().getVolume(volumeId);
+    private void validateVolume(final short volumeId) throws ServiceException {
+        final var vol = VolumeManager.getInstance().getVolume(volumeId);
         if (vol.getType() != 1 && vol.getType() != 2) {
             throw ServiceException.FAILURE("Volume is invalid: " + vol, null);
         }
