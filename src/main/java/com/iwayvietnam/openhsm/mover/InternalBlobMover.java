@@ -25,6 +25,7 @@ package com.iwayvietnam.openhsm.mover;
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
 import com.iwayvietnam.openhsm.util.DbHelper;
 import com.iwayvietnam.openhsm.util.Log;
+import com.iwayvietnam.openhsm.util.MailboxHelper;
 import com.zimbra.common.account.Key;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.StringUtil;
@@ -74,7 +75,7 @@ public class InternalBlobMover implements BlobMover {
         ZimbraLog.removeAccountFromContext();
         ZimbraLog.addMboxToContext(mboxId);
 
-        if (!isLocalMailbox(accountId)) {
+        if (!MailboxHelper.isLocalMailbox(accountId)) {
             Log.openhsm.info(
             "Skipping mailbox %d because it has been moved to another server.",
                 mboxId
@@ -270,13 +271,13 @@ public class InternalBlobMover implements BlobMover {
             }
 
             ZimbraLog.removeItemFromContext(0);
-            deleteBlobs(blobsToDelete);
+            MailboxHelper.deleteBlobs(blobsToDelete);
             state.incrementNumMoved(numMoved);
             allLinkedNewBlobs.putAll(linkedNewBlobs);
         } catch (ServiceException e) {
             state.setError(e);
-            deleteBlobs(unprocessedNewBlobs);
-            deleteBlobs(blobsToDelete);
+            MailboxHelper.deleteBlobs(unprocessedNewBlobs);
+            MailboxHelper.deleteBlobs(blobsToDelete);
             throw e;
         } finally {
             if (numMoved > 0) {
@@ -289,25 +290,7 @@ public class InternalBlobMover implements BlobMover {
         }
     }
 
-    private static void deleteBlobs(Collection<MailboxBlob> mblobs) {
-        if (mblobs != null) {
-            for(var mblob : mblobs) {
-                StoreManager.getReaderSMInstance(mblob.getLocator()).quietDelete(mblob);
-            }
-        }
-    }
-
-    private static boolean isLocalMailbox(String accountId) throws ServiceException {
-        var account = Provisioning.getInstance().get(Key.AccountBy.id, accountId);
-        if (account == null) {
-            Log.openhsm.warn("Unable to look up account %s.", accountId);
-            return false;
-        } else {
-            return Provisioning.onLocalServer(account);
-        }
-    }
-
-    private static void validateVolume(short volumeId) throws ServiceException {
+    private void validateVolume(short volumeId) throws ServiceException {
         var vol = VolumeManager.getInstance().getVolume(volumeId);
         if (vol.getType() != 1 && vol.getType() != 2) {
             throw ServiceException.FAILURE("Volume is invalid: " + vol, null);
