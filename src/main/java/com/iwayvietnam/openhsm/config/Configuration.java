@@ -38,4 +38,6 @@ public interface Configuration {
     int getDeleteThreads();
 
     int getHsmBatchSize();
+
+    int getHsmParallelismLevel();
 }

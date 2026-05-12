@@ -37,4 +37,5 @@ public final class SettingsConstants {
     public static final String ZM_S3_DELETE_THREADS = "s3.deleteThreads";
 
     public static final String ZM_HSM_BATCH_SIZE = "hsm.batchSize";
+    public static final String ZM_HSM_PARALLELISM_LEVEL = "s3.parallelismLevel";
 }

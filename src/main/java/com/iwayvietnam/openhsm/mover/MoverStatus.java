@@ -27,10 +27,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Mover State
+ * Mover Status
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public class MoverState {
+public class MoverStatus {
     private final Date startDate = new Date();
     private volatile Date endDate = null;
     private volatile int totalMailboxes = 0;

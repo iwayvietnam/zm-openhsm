@@ -22,24 +22,32 @@
  */
 package com.iwayvietnam.openhsm.mover;
 
-import com.zimbra.common.service.ServiceException;
-import com.zimbra.cs.mailbox.MailItem;
-
-import java.util.List;
-import java.util.Set;
-
 /**
- * Blob mover interface
+ * Movement Status
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-public interface BlobMover {
-    MoverStatus moveBlobs(
-        String query,
-        Set<MailItem.Type> types,
-        List<Short> srcVolumeIds,
-        short destVolumeId,
-        Long maxBytes,
-        int mboxId,
-        String accountId
-    ) throws ServiceException;
+public class MovementStatus {
+    private final MovedItem movedItem;
+    private Status status;
+
+    public MovementStatus(MovedItem movedItem) {
+        this.movedItem = movedItem;
+    }
+
+    public MovementStatus(MovedItem movedItem, Status status) {
+        this.movedItem = movedItem;
+        this.status = status;
+    }
+
+    public MovedItem getMovedItem() {
+        return movedItem;
+    }
+
+    public Status getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

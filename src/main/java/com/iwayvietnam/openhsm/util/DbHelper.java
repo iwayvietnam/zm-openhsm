@@ -20,8 +20,9 @@
  *
  * Written by Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
-package com.iwayvietnam.openhsm.mover;
+package com.iwayvietnam.openhsm.util;
 
+import com.iwayvietnam.openhsm.mover.MovedItem;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.cs.db.Db;
 import com.zimbra.cs.db.DbMailItem;
@@ -53,6 +54,27 @@ public class DbHelper {
             mbox.getId(),
             info.getId(),
             info.getModifyContent()
+        );
+
+        return numRows == 1;
+    }
+
+    public static boolean alterVolume(Mailbox mbox, MovedItem info, String locator) throws ServiceException {
+        var table = info.fromRevision() ?
+                DbMailItem.getRevisionTableName(mbox, info.fromDumpster()) :
+                DbMailItem.getMailItemTableName(mbox, info.fromDumpster());
+        var idColumn = info.fromRevision() ? "item_id" : "id";
+
+        var sql = String.format(
+                "UPDATE %s SET locator = ? WHERE %s = ? AND mod_content = ?",
+                table,
+                DbMailItem.IN_THIS_MAILBOX_AND + idColumn
+        );
+        var numRows = DbUtil.executeUpdate(sql,
+                locator,
+                mbox.getId(),
+                info.getId(),
+                info.getModifyContent()
         );
 
         return numRows == 1;

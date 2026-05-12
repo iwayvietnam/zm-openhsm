@@ -38,6 +38,7 @@ import java.util.Properties;
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
 public class PropertiesConfiguration implements Configuration {
+    public static final int PARALLELISM_LEVEL = 5;
 
     private static final Map<String, String> properties = new HashMap<>();
 
@@ -47,6 +48,7 @@ public class PropertiesConfiguration implements Configuration {
     private final String storeName;
     private final int deleteThreads;
     private final int hsmBatchSize;
+    private final int parallelismLevel;
 
     private PropertiesConfiguration()
     {
@@ -58,6 +60,7 @@ public class PropertiesConfiguration implements Configuration {
         storeName = loadStringProperty(SettingsConstants.ZM_S3_STORE_NAME);
         deleteThreads = loadIntProperty(SettingsConstants.ZM_S3_DELETE_THREADS);
         hsmBatchSize = loadIntProperty(SettingsConstants.ZM_HSM_BATCH_SIZE);
+        parallelismLevel = loadIntProperty(SettingsConstants.ZM_HSM_PARALLELISM_LEVEL, PARALLELISM_LEVEL);
     }
 
     private static final class InstanceHolder {
@@ -98,16 +101,25 @@ public class PropertiesConfiguration implements Configuration {
         return hsmBatchSize;
     }
 
+    @Override
+    public int getHsmParallelismLevel() {
+        return parallelismLevel;
+    }
+
     private static String loadStringProperty(final String key) {
         return properties.get(key);
     }
 
     private static int loadIntProperty(final String key) {
+        return loadIntProperty(key, 0);
+    }
+
+    private static int loadIntProperty(final String key, final int defaultValue) {
         final var value = properties.get(key);
         if (!StringUtil.isNullOrEmpty(value)) {
             return Integer.parseInt((value).trim());
         }
-        return 0;
+        return defaultValue;
     }
 
     private static void loadSettingsFromProperties() {

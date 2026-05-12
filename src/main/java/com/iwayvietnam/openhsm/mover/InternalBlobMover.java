@@ -23,6 +23,7 @@
 package com.iwayvietnam.openhsm.mover;
 
 import com.iwayvietnam.openhsm.config.PropertiesConfiguration;
+import com.iwayvietnam.openhsm.util.DbHelper;
 import com.iwayvietnam.openhsm.util.Log;
 import com.zimbra.common.account.Key;
 import com.zimbra.common.service.ServiceException;
@@ -47,21 +48,21 @@ import java.util.concurrent.ConcurrentMap;
  * @author Nguyen Van Nguyen <nguyennv1981@gmail.com>
  */
 public class InternalBlobMover implements BlobMover {
-    private final MoverState state = new MoverState();
+    private final MoverStatus state = new MoverStatus();
     private final Map<String, MailboxBlob> allLinkedNewBlobs = new HashMap<>();
     private final int batchSize = PropertiesConfiguration.getInstance().getHsmBatchSize();
     private static final ConcurrentMap<Integer, Integer> mailboxGuard = new ConcurrentHashMap<>();
 
-    public MoverState moveBlobs(String query, Set<MailItem.Type> types, List<Short> sourceVolumeIds, short destVolumeId, Long maxBytes, int mboxId, String accountId) throws ServiceException {
+    public MoverStatus moveBlobs(String query, Set<MailItem.Type> types, List<Short> srcVolumeIds, short destVolumeId, Long maxBytes, int mboxId, String accountId) throws ServiceException {
         this.validateVolume(destVolumeId);
-        for(var volumeId : sourceVolumeIds) {
+        for(var volumeId : srcVolumeIds) {
             this.validateVolume(volumeId);
         }
         Log.openhsm.info(
             "Moving blobs matching query '%s' for type(s) %s from volume(s) %s to volume %d.",
             query,
             MailItem.Type.toString(types),
-            StringUtil.join(", ", sourceVolumeIds),
+            StringUtil.join(", ", srcVolumeIds),
             state.getDestVolumeId()
         );
 
@@ -97,10 +98,10 @@ public class InternalBlobMover implements BlobMover {
                 continue;
             }
             if (!itemIds.isEmpty()) {
-                items.addAll(DbHelper.getItems(mbox, itemIds, sourceVolumeIds, fromDumpster));
+                items.addAll(DbHelper.getItems(mbox, itemIds, srcVolumeIds, fromDumpster));
             }
             if (Provisioning.getInstance().getLocalServer().isHsmMovePreviousRevisions()) {
-                items.addAll(DbHelper.getItemsRevisions(mbox, itemIds, sourceVolumeIds, fromDumpster));
+                items.addAll(DbHelper.getItemsRevisions(mbox, itemIds, srcVolumeIds, fromDumpster));
             }
             if (!items.isEmpty()) {
                 this.safeMoveBlobs(mbox, items);
@@ -296,7 +297,7 @@ public class InternalBlobMover implements BlobMover {
         }
     }
 
-    private boolean isLocalMailbox(String accountId) throws ServiceException {
+    private static boolean isLocalMailbox(String accountId) throws ServiceException {
         var account = Provisioning.getInstance().get(Key.AccountBy.id, accountId);
         if (account == null) {
             Log.openhsm.warn("Unable to look up account %s.", accountId);
@@ -306,7 +307,7 @@ public class InternalBlobMover implements BlobMover {
         }
     }
 
-    private void validateVolume(short volumeId) throws ServiceException {
+    private static void validateVolume(short volumeId) throws ServiceException {
         var vol = VolumeManager.getInstance().getVolume(volumeId);
         if (vol.getType() != 1 && vol.getType() != 2) {
             throw ServiceException.FAILURE("Volume is invalid: " + vol, null);
